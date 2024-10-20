@@ -1,0 +1,61 @@
+//@input Component.VFXComponent spell
+//@input SceneObject wand
+//@input string SpellName = "confusion"
+
+var triggerStartTime = 0;  // Track when the event starts
+var eventActive = false;   // Check if the event is currently active
+var activationTime = 6.0;  // 2 seconds threshold for activation
+
+script.createEvent("UpdateEvent").bind(Update);
+
+script.onPressDown = function () {
+  activateSpell();
+};
+
+function Update() {
+    // Set the new position and direction to the VFX spell
+    script.spell.asset.properties['Position'] = script.wand.getTransform().getWorldPosition();
+    script.spell.asset.properties['Direction'] = script.wand.getTransform().right;    
+    
+    // Check if the event is active and if it's been more than 2 seconds
+    if (eventActive) {
+        if (getTime() - triggerStartTime >= activationTime) {
+            // Reset the eventActive flag so the spell only activates once per trigger
+            eventActive = false;
+            script.spell.asset.properties['Effect_Strength'] = 0;
+            
+            var white = new vec3(1, 1, 1);
+            var grey = new vec3(0.3, 0.3, 0.3);
+            script.spell.asset.properties['Spell_Color_1'] = grey;
+            script.spell.asset.properties['Spell_Color_2'] = white;
+        }
+    }
+}
+
+function activateSpell() {
+    var color1 = new vec3(1, 1, 1); // Default white
+    var color2 = new vec3(1, 1, 1); // Default white
+    eventActive = true;
+
+    // Spell-specific color logic
+    switch (script.SpellName.toLowerCase()) {
+        case "fireball":
+            color1 = new vec3(1, 0, 0);  // Red
+            color2 = new vec3(1, 0.5, 0); // Orange
+            break;
+        case "confusion":
+            color1 = new vec3(0, 0, 1);   // Blue
+            color2 = new vec3(0.2, 0, 0.5); // Purple
+            break;
+        default:
+            print("Unknown spell: " + script.SpellName);
+    }
+
+    // Set the color properties
+    script.spell.asset.properties['Spell_Color_1'] = color1;
+    script.spell.asset.properties['Spell_Color_2'] = color2;
+
+    script.spell.asset.properties['Effect_Strength'] = 1000;
+    triggerStartTime = getTime();
+    print("Spell Activated: " + script.SpellName);
+}
