@@ -1,0 +1,18 @@
+//@input Component.Text transcript
+
+script.createEvent("UpdateEvent").bind(Update);
+
+function Update() {
+    // Get the transcript text and convert it to lowercase
+    var transcriptText = script.transcript.text.toLowerCase();
+    
+    print(transcriptText);
+
+    if (transcriptText) {
+        if (transcriptText.includes("fireball")) {
+            global.activateSpell("fireball");
+        } else if (transcriptText.includes("confusion")) {
+            global.activateSpell("confusion");
+        }
+    }
+}
